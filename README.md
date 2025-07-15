@@ -1,44 +1,53 @@
-# EDS Page
+# Repair Wafer LOT
 
-This repository contains the source code for the EDS Top Page, a web portal for accessing various internal systems related to LSI production.
+A simple utility to repair wafer lot data files by correcting wafer sequence information and updating lot names. This tool is designed for semiconductor manufacturing environments where wafer data files (`.DAT`) can become corrupted or require manual correction.
 
 ## Description
 
-The EDS Top Page serves as a centralized index of links to different web-based tools and systems used in the EDS (Electrical Die Sorting) process of LSI (Large-Scale Integration) production. It provides a user-friendly interface with different zones for various departments or functions.
+The **Repair Wafer LOT** application provides a straightforward graphical user interface to fix issues in `LOT.DAT` files. It operates in two modes, **Wafer Mapping** and **After AOI**, to handle different stages of the manufacturing process. The tool reads a specified lot number, identifies the associated wafer data files, and then programmatically writes the correct wafer sequence and lot name into the binary `LOT.DAT` file.
+
+This is particularly useful when the number and sequence of wafers are incorrectly represented in the lot file, which can happen for various reasons during automated processing. The application ensures data integrity for downstream operations.
 
 ## Features
 
-* **Centralized Portal:** Provides a single point of access to multiple internal web services.
-* **Organized by Zones:** The page is divided into the following zones for easy navigation:
-    * COMMON ZONE
-    * PD ZONE
-    * PM ZONE
-    * TE ZONE
-* **Responsive Design:** The page layout adjusts for different screen sizes.
-* **Custom Error Pages:** Includes custom HTML pages for various HTTP error codes to provide a consistent user experience.
+  * **Corrects Wafer Information**: Automatically repairs the wafer number sequence within the `LOT.DAT` file.
+  * **Updates Lot Name**: Converts the ASCII lot name provided by the user into hexadecimal format and writes it into the `LOT.DAT` file.
+  * **Two Operational Modes**:
+      * **WaferMapping**: For lots processed through the wafer mapping stage.
+      * **AfterAOI**: For lots processed after Automated Optical Inspection (AOI).
+  * **Simple User Interface**: An intuitive interface for ease of use, requiring only the lot number and the selection of a processing mode.
+  * **Handles Full and Partial Lots**: Includes logic to correctly handle both full lots of 25 wafers and partial lots with fewer wafers.
 
-## Pages
+## How to Use
 
-### Main Page
+1.  **Launch the application**.
+2.  In the main window, **enter the target lot number** into the text field.
+3.  **Select the appropriate mode** by clicking either the `WaferMapping` or `AfterAOI` radio button.
+4.  Click the **Repair** button to start the process.
+5.  The application will then locate the specified directory, read the `W-NO-*.DAT` files to determine the correct wafer sequence, and write the corrected data to the `LOT.DAT` file.
+6.  A "Repair Success" message will appear upon completion.
 
-* **`EDSTopPage.html`**: The main entry point of the web application. It displays the links to the various systems.
+## Configuration
 
-### Error Pages
+Before using the application, you must configure the file paths in the `App.config` file. These paths tell the application where to find the lot folders.
 
-* `401.html`: Unauthorized
-* `403.html`: Forbidden
-* `404.html`: Page Not Found
-* `405.html`: Method Not Allowed
-* `406.html`: Not Acceptable
-* `412.html`: Precondition Failed
-* `500.html`: Internal Server Error
-* `501.html`: Not Implemented
-* `502.html`: Bad Gateway
+Open `App.config` and modify the `value` for the following keys to point to your data directories:
 
-## Installation
+```xml
+<configuration>
+	...
+	<appSettings>
+		<add key="WaferMappingPath"  value="C:\\Users\\Desktop\\WaferMapping\\"  />
+		<add key="AfterAOIPath"  value="C:\\Users\\Desktop\\AfterAOI\\"  />
+	</appSettings>
+</configuration>
+```
 
-To use this page, set `EDSTopPage.html` as the default or index page on your web server.
+  * **`WaferMappingPath`**: The base directory where lot folders from the Wafer Mapping process are stored.
+  * **`AfterAOIPath`**: The base directory where lot folders from the After AOI process are stored.
 
-## Usage
+The application will append the lot number entered in the UI to these paths to find the correct folder.
 
-Once the page is set up, users can navigate to the main page and click on the "Enter" button for the desired system. The links on the page are configured to redirect to the respective internal web services.
+## Prerequisites
+
+  * .NET Framework 4.7.2 or later.
